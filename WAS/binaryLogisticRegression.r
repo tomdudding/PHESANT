@@ -77,17 +77,21 @@ binaryLogisticRegression <- function(varName, varType, thisdata, isExposure) {
 
 		mylogit <- glm(phenoFactor ~ geno + ., data=confounders, family="binomial")
 
+		snplist<-c("rs3755967","rs12785878","rs10741657","rs17216707","rs10745742","rs8018720","rs117913124")
+		
+		for (var in snplist) {
+		  
 		sink()
              	sink(resLogFile, append=TRUE)
 		
                 sumx = summary(mylogit)
 
-                pvalue = sumx$coefficients['geno','Pr(>|z|)']
-                beta = sumx$coefficients["geno","Estimate"]
+                pvalue = sumx$coefficients[var,'Pr(>|z|)']
+                beta = sumx$coefficients[var,"Estimate"]
 
 
 		if (opt$confidenceintervals == TRUE) {
-			cis = confint(mylogit, "geno", level=0.95)
+			cis = confint(mylogit, var, level=0.95)
 	                lower = cis["2.5 %"]
 	                upper = cis["97.5 %"]
 		}
@@ -99,7 +103,9 @@ binaryLogisticRegression <- function(varName, varType, thisdata, isExposure) {
                 numNotNA = length(na.omit(phenoFactor))
 
                 ## save result to file
-                write(paste(varName,varType,paste(idxTrue,"/",idxFalse,"(",numNotNA,")",sep=""), beta,lower,upper,pvalue, sep=","), file=paste(opt$resDir,"results-logistic-binary-",opt$varTypeArg,".txt",sep=""), append="TRUE");
+                write(paste(var,varName,varType,paste(idxTrue,"/",idxFalse,"(",numNotNA,")",sep=""), beta,lower,upper,pvalue, sep=","), file=paste(opt$resDir,"results-logistic-binary-",opt$varTypeArg,".txt",sep=""), append="TRUE");
+               
+		}
                 cat("SUCCESS results-logistic-binary ");
                 
 		incrementCounter("success.binary")

@@ -199,18 +199,22 @@ testContinuous2 <- function(varName, varType, thisdata) {
 
 			fit <- lm(phenoIRNT ~ geno + ., data=confounders)
 			
+			snplist<-c("rs3755967","rs12785878","rs10741657","rs17216707","rs10745742","rs8018720","rs117913124")
+			
+			for (var in snplist) {
+			
 			sink()
 			sink(resLogFile, append=TRUE)
 			
 			sumx = summary(fit)
 
-			pvalue = sumx$coefficients['geno','Pr(>|t|)']
-			beta = sumx$coefficients["geno","Estimate"]
+			pvalue = sumx$coefficients[var,'Pr(>|t|)']
+			beta = sumx$coefficients[var,"Estimate"]
 
 			if (opt$confidenceintervals == TRUE) {
 				cis = confint(fit, level=0.95)
-				lower = cis["geno", "2.5 %"]
-	                        upper = cis["geno", "97.5 %"]
+				lower = cis[var, "2.5 %"]
+	                        upper = cis[var, "97.5 %"]
                         }
                         else {
                                 lower = NA
@@ -220,7 +224,9 @@ testContinuous2 <- function(varName, varType, thisdata) {
 			numNotNA = length(which(!is.na(phenoIRNT)))
 
 			## save result to file
-			write(paste(varName, varType, numNotNA, beta, lower, upper, pvalue, sep=","), file=paste(opt$resDir,"results-linear-",opt$varTypeArg,".txt", sep=""), append="TRUE");
+			write(paste(var, varName, varType, numNotNA, beta, lower, upper, pvalue, sep=","), file=paste(opt$resDir,"results-linear-",opt$varTypeArg,".txt", sep=""), append="TRUE");
+			}
+			
 			cat("SUCCESS results-linear");
 
 			incrementCounter("success.continuous")
