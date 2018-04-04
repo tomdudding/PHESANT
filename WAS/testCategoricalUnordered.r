@@ -75,9 +75,15 @@ testCategoricalUnordered <- function(varName, varType, thisdata) {
 		tryCatch({
 
 		fit <- multinom(phenoFactor ~ geno + ., data=confounders, maxit=1000)
-
+    
+		snplist<-c("rs3755967","rs12785878","rs10741657","rs17216707","rs10745742","rs8018720","rs117913124")
+		snplist[!snplist %in% snplist[1]]
+		
+		for (var in snplist) {
+		  LOO<-snplist[!snplist %in% var]
+		
 		## baseline model with only confounders, to which we compare the model above
-		fitB <- multinom(phenoFactor ~ ., data=confounders, maxit=1000)
+		fitB <- multinom(phenoFactor ~ LOO, data=confounders, maxit=1000)
 
 		## compare model to baseline model
 		require(lmtest)
@@ -87,8 +93,8 @@ testCategoricalUnordered <- function(varName, varType, thisdata) {
 		## save result to file
 		maxFreq = length(which(phenoFactor==reference));
 		numNotNA = length(which(!is.na(pheno)))
-	    	write(paste(paste(varName,"-",reference,sep=""), varType, paste(maxFreq,"/",numNotNA,sep=""), -999, -999, -999, modelP, sep=","), file=paste(opt$resDir,"results-multinomial-logistic-",opt$varTypeArg,".txt",sep=""), append="TRUE")
-
+	    	write(paste(var, paste(varName,"-",reference,sep=""), varType, paste(maxFreq,"/",numNotNA,sep=""), -999, -999, -999, modelP, sep=","), file=paste(opt$resDir,"results-multinomial-logistic-",opt$varTypeArg,".txt",sep=""), append="TRUE")
+		}
 		sink()
 		sink(resLogFile, append=TRUE)	
 		
@@ -124,7 +130,7 @@ testCategoricalUnordered <- function(varName, varType, thisdata) {
 			numThisValue = length(which(phenoFactor==u));
 
 			## save result to file
-			write(paste(paste(varName,"-",reference,"#",u,sep=""), varType, paste(maxFreq,"#",numThisValue,sep=""), beta, lower, upper, pvalue, sep=","), file=paste(opt$resDir,"results-multinomial-logistic-",opt$varTypeArg,".txt",sep=""), append="TRUE")
+			#write(paste(paste(varName,"-",reference,"#",u,sep=""), varType, paste(maxFreq,"#",numThisValue,sep=""), beta, lower, upper, pvalue, sep=","), file=paste(opt$resDir,"results-multinomial-logistic-",opt$varTypeArg,".txt",sep=""), append="TRUE")
 			
 		}
 

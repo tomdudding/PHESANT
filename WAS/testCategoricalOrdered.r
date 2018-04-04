@@ -77,15 +77,20 @@ testCategoricalOrdered <- function(varName, varType, thisdata, orderStr="") {
 		fit <- polr(phenoFactor ~ geno + ., data=confounders, Hess=TRUE)
 
 		ctable <- coef(summary(fit))
+		
+		snplist<-c("rs3755967","rs12785878","rs10741657","rs17216707","rs10745742","rs8018720","rs117913124")
+		
+		for (var in snplist) {
+		
 		sink()
 		sink(resLogFile, append=TRUE)
 
 		ct = coeftest(fit)
-		pvalue = ct["geno","Pr(>|t|)"]
-		beta = ctable["geno", "Value"];
+		pvalue = ct[var,"Pr(>|t|)"]
+		beta = ctable[var, "Value"];
 
 		if (opt$confidenceintervals == TRUE) {
-			se = ctable["geno", "Std. Error"]
+			se = ctable[var, "Std. Error"]
 			lower = beta - 1.96*se;
 	                upper = beta + 1.96*se;
                 }
@@ -94,7 +99,10 @@ testCategoricalOrdered <- function(varName, varType, thisdata, orderStr="") {
                         upper = NA
                 }
 
-		write(paste(varName, varType, numNotNA, beta, lower, upper, pvalue, sep=","), file=paste(opt$resDir,"results-ordered-logistic-",opt$varTypeArg,".txt",sep=""), append="TRUE");
+		write(paste(var, varName, varType, numNotNA, beta, lower, upper, pvalue, sep=","), file=paste(opt$resDir,"results-ordered-logistic-",opt$varTypeArg,".txt",sep=""), append="TRUE");
+	
+		}
+		
 		cat("SUCCESS results-ordered-logistic");
 		incrementCounter("success.ordCat")
 
