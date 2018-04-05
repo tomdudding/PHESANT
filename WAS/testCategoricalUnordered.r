@@ -80,7 +80,9 @@ testCategoricalUnordered <- function(varName, varType, thisdata) {
 		snplist[!snplist %in% snplist[1]]
 		
 		for (var in snplist) {
+		  
 		  LOO<-noquote(paste(snplist[!snplist %in% var]), collapse =' + ')
+
 		
 		## baseline model with only confounders, to which we compare the model above
 		fitB <- multinom(phenoFactor ~ LOO, data=confounders, maxit=1000)
